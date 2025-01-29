@@ -1,0 +1,98 @@
+services:
+  db:
+    image: docker.io/library/postgres:17-alpine
+    restart: always
+    ports:
+      - 5432:5432
+    volumes:
+      - db:/var/lib/postgresql/data:z
+    env_file:
+      - db.env
+
+  redis:
+    image: docker.io/library/redis:alpine
+    restart: always
+
+  app:
+    image: docker.io/library/nextcloud:fpm-alpine
+    restart: always
+    depends_on:
+      - redis
+      - db
+      - smtp
+    volumes:
+      - nextcloud:/var/www/html:z
+    environment:
+      - POSTGRES_HOST=db
+      - REDIS_HOST=redis
+      - NEXTCLOUD_TRUSTED_DOMAINS=${NEXTCLOUD_TRUSTED_DOMAINS}
+      - TRUSTED_PROXIES=${NEXTCLOUD_TRUSTED_PROXIES}
+      - SMTP_HOST=smtp
+      - SMTP_PORT=2525
+    env_file:
+      - db.env
+      - s3.env
+
+  web:
+    image: docker.io/library/nginx
+    restart: always
+    ports:
+      - 8443:443
+    depends_on:
+      - self-sign
+      - app
+    volumes:
+      - nextcloud:/var/www/html:z,ro
+      - certs:/etc/ssl/certs:z,ro
+      - ./web/nginx.conf:/etc/nginx/nginx.conf:z,ro
+    volumes_from:
+      - app
+
+  cron:
+    image: nextcloud:fpm-alpine
+    restart: always
+    volumes:
+      - nextcloud:/var/www/html:z
+      # NOTE: The `volumes` config of the `cron` and `app` containers must match
+    entrypoint: /cron.sh
+    depends_on:
+      - db
+      - redis
+
+  self-sign:
+    image: paulczar/omgwtfssl
+    restart: "no"
+    volumes:
+      - certs:/certs
+    environment:
+      - SSL_SUBJECT=nextcloud.local
+      - CA_SUBJECT=admin@grd0.net
+      - SSL_KEY=/certs/nextcloud.local.key
+      - SSL_CSR=/certs/nextcloud.local.csr
+      - SSL_CERT=/certs/nextcloud.local.crt
+
+  tunnel:
+    image: cloudflare/cloudflared
+    restart: unless-stopped
+    command: tunnel run
+    environment:
+      - TUNNEL_EDGE_IP_VERSION=auto
+    env_file:
+      - cloudflared.env
+  
+  smtp:
+    image: kostyaesmukov/smtp_to_telegram
+    restart: always
+    environment:
+      - "Subject: {subject}\\n\\n{body}\\n\\n{attachments_details}"
+    env_file:
+      - smtp.env
+
+volumes:
+  nextcloud:
+  db:
+  certs:
+
+networks:
+  default:
+    enable_ipv6: true
