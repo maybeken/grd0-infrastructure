@@ -1,0 +1,39 @@
+services:
+  app:
+    image: docker.io/library/nextcloud:fpm-alpine
+    restart: always
+    ports:
+      - 9000:9000
+    depends_on:
+      - smtp
+    volumes:
+      - nextcloud:/var/www/html
+    environment:
+      - POSTGRES_HOST=${CLUSTER_PRIMARY_HOST}
+      - REDIS_HOST=${CLUSTER_PRIMARY_HOST}
+      - NEXTCLOUD_TRUSTED_DOMAINS=${NEXTCLOUD_TRUSTED_DOMAINS}
+      - TRUSTED_PROXIES=${NEXTCLOUD_TRUSTED_PROXIES}
+      - SMTP_HOST=smtp
+      - SMTP_PORT=2525
+    env_file:
+      - db.env
+      - s3.env
+
+  smtp:
+    image: kostyaesmukov/smtp_to_telegram
+    restart: always
+    environment:
+      - "Subject: {subject}\\n\\n{body}\\n\\n{attachments_details}"
+    env_file:
+      - smtp.env
+
+volumes:
+  nextcloud:
+    driver_opts:
+      type: nfs4
+      o: addr=${CLUSTER_PRIMARY_HOST},nolock,soft,rw
+      device: :/
+
+networks:
+  default:
+    enable_ipv6: true
