@@ -1,0 +1,76 @@
+services:
+  web:
+    image: ghcr.io/hoarder-app/hoarder:${HOARDER_VERSION:-release}
+    restart: unless-stopped
+    volumes:
+      - data:/data
+    ports:
+      - 3000:3000
+    env_file:
+      - .env
+    environment:
+      MEILI_ADDR: http://meilisearch:7700
+      BROWSER_WEB_URL: http://chrome:9222
+      OLLAMA_BASE_URL: http://host.docker.internal:11434
+      INFERENCE_TEXT_MODEL: deepseek-r1
+      INFERENCE_IMAGE_MODEL: llava
+      DATA_DIR: /data
+      DISABLE_SIGNUPS: false
+    
+  chrome:
+    image: gcr.io/zenika-hub/alpine-chrome:123
+    restart: unless-stopped
+    command:
+      - --no-sandbox
+      - --disable-gpu
+      - --disable-dev-shm-usage
+      - --remote-debugging-address=0.0.0.0
+      - --remote-debugging-port=9222
+      - --hide-scrollbars
+  meilisearch:
+    image: getmeili/meilisearch:v1.11.1
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      MEILI_NO_ANALYTICS: "true"
+    volumes:
+      - meilisearch:/meili_data
+
+  self-sign:
+    image: paulczar/omgwtfssl
+    restart: "no"
+    volumes:
+      - certs:/certs
+    environment:
+      - SSL_SUBJECT=hoarder.local
+      - CA_SUBJECT=admin@grd0.net
+      - SSL_KEY=/certs/hoarder.local.key
+      - SSL_CSR=/certs/hoarder.local.csr
+      - SSL_CERT=/certs/hoarder.local.crt
+
+  caddy:
+    image: caddy:alpine
+    restart: unless-stopped
+    ports:
+      - 8443:443
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - certs:/etc/ssl/certs:z,ro
+    depends_on:
+      - self-sign
+
+  tunnel:
+    image: cloudflare/cloudflared
+    restart: unless-stopped
+    command: tunnel run
+    environment:
+      - TUNNEL_EDGE_IP_VERSION=auto
+    env_file:
+      - cloudflared.env
+
+
+volumes:
+  meilisearch:
+  data:
+  certs:
