@@ -18,7 +18,7 @@ echo \
   sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
 sudo apt update
-sudo apt install -y htop docker-ce rsync
+sudo apt install -y htop docker-ce rsync docker-compose-plugin
 
 sudo modprobe nfs 
 sudo modprobe nfsd
