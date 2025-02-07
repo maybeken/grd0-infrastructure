@@ -11,14 +11,18 @@ services:
     environment:
       MEILI_ADDR: http://meilisearch:7700
       BROWSER_WEB_URL: http://chrome:9222
-      OLLAMA_BASE_URL: http://host.docker.internal:11434
+      OLLAMA_BASE_URL: http://ollama:11434
       INFERENCE_TEXT_MODEL: deepseek-r1
       INFERENCE_IMAGE_MODEL: llava-phi3
-      INFERENCE_CONTEXT_LENGTH: 4096
+      INFERENCE_CONTEXT_LENGTH: 2048
+      INFERENCE_JOB_TIMEOUT_SEC: 300
       CRAWLER_FULL_PAGE_SCREENSHOT: true
       OCR_LANGS: eng, chi_tra, chi_sim
       DATA_DIR: /data
       DISABLE_SIGNUPS: false
+    depends_on: 
+      - ollama
+      - meilisearch
     
   chrome:
     image: gcr.io/zenika-hub/alpine-chrome:123
@@ -55,8 +59,8 @@ services:
   caddy:
     image: caddy:alpine
     restart: unless-stopped
-    ports:
-      - 8443:443
+    # ports:
+    #   - 8443:443
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
       - certs:/etc/ssl/certs:z,ro
@@ -72,8 +76,19 @@ services:
     env_file:
       - cloudflared.env
 
+  ollama:
+    image: ollama/ollama
+    restart: unless-stopped
+    volumes:
+      - ollama:/root/.ollama
+    deploy:
+      resources:
+        limits:
+          cpus: '4'
+
 
 volumes:
   meilisearch:
   data:
   certs:
+  ollama:
