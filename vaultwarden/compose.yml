@@ -40,7 +40,7 @@ services:
     restart: unless-stopped
     command: tunnel run
     environment:
-      - TUNNEL_EDGE_IP_VERSION=6
+      - TUNNEL_EDGE_IP_VERSION=auto
     env_file:
       - cloudflared.env
 
