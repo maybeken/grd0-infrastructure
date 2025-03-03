@@ -4,16 +4,14 @@ services:
     restart: unless-stopped
     volumes:
       - data:/data
-    ports:
-      - 3000:3000
     env_file:
       - .env
     environment:
       MEILI_ADDR: http://meilisearch:7700
       BROWSER_WEB_URL: http://chrome:9222
       OLLAMA_BASE_URL: http://ollama:11434
-      INFERENCE_TEXT_MODEL: deepseek-r1
-      INFERENCE_IMAGE_MODEL: llava-phi3
+      INFERENCE_TEXT_MODEL: deepseek-r1:1.5b
+      INFERENCE_IMAGE_MODEL: minicpm-v
       INFERENCE_CONTEXT_LENGTH: 2048
       INFERENCE_JOB_TIMEOUT_SEC: 300
       CRAWLER_FULL_PAGE_SCREENSHOT: true
