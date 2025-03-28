@@ -1,0 +1,5 @@
+:443 {
+	reverse_proxy authelia:9091
+
+	tls /etc/ssl/certs/authelia.local.crt /etc/ssl/certs/authelia.local.key
+}

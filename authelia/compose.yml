@@ -1,0 +1,73 @@
+services:
+  authelia:
+    image: 'docker.io/authelia/authelia:latest'
+    restart: 'unless-stopped'
+    environment:
+      AUTHELIA_IDENTITY_VALIDATION_RESET_PASSWORD_JWT_SECRET_FILE: '/secrets/JWT_SECRET'
+      AUTHELIA_SESSION_SECRET_FILE: '/secrets/SESSION_SECRET'
+      AUTHELIA_STORAGE_POSTGRES_PASSWORD_FILE: '/secrets/STORAGE_PASSWORD'
+      AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE: '/secrets/STORAGE_ENCRYPTION_KEY'
+    volumes:
+      - '${PWD}/config:/config'
+      - '${PWD}/secrets:/secrets'
+    depends_on:
+      - redis
+      - db
+
+  db:
+    image: docker.io/library/postgres:17-alpine
+    restart: always
+    volumes:
+      - db:/var/lib/postgresql/data:z
+    env_file:
+      - db.env
+
+  redis:
+    image: eqalpha/keydb
+    restart: always
+
+  self-sign:
+    image: paulczar/omgwtfssl
+    restart: "no"
+    volumes:
+      - certs:/certs
+    environment:
+      - SSL_SUBJECT=authelia.local
+      - CA_SUBJECT=admin@grd0.net
+      - SSL_KEY=/certs/authelia.local.key
+      - SSL_CSR=/certs/authelia.local.csr
+      - SSL_CERT=/certs/authelia.local.crt
+
+  caddy:
+    image: caddy:alpine
+    restart: unless-stopped
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - certs:/etc/ssl/certs:z,ro
+    depends_on:
+      - self-sign
+
+  smtp:
+    image: kostyaesmukov/smtp_to_telegram
+    restart: always
+    environment:
+      - "Subject: {subject}\\n\\n{body}\\n\\n{attachments_details}"
+    env_file:
+      - smtp.env
+
+  tunnel:
+    image: cloudflare/cloudflared
+    restart: unless-stopped
+    command: tunnel run
+    environment:
+      - TUNNEL_EDGE_IP_VERSION=auto
+    env_file:
+      - cloudflared.env
+
+volumes:
+  db:
+  certs:
+
+networks:
+  default:
+    enable_ipv6: true
