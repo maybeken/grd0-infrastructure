@@ -10,8 +10,7 @@ services:
     env_file:
       - api.env
     volumes:
-      - /Users/ken.lam/Git/grd0-site-monorepo/api/data/files:/opt/app/data/files
-      - /Users/ken.lam/Git/grd0-site-monorepo/api/data/api.db:/opt/app/data/api.db
+      - ./data:/opt/app/data
     restart: unless-stopped
 
   self-sign:
@@ -29,8 +28,6 @@ services:
   caddy:
     image: caddy:alpine
     restart: unless-stopped
-    ports:
-      - 8443:443
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
       - certs:/etc/ssl/certs:z,ro
