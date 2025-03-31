@@ -1,0 +1,5 @@
+:443 {
+	reverse_proxy api:80
+
+	tls /etc/ssl/certs/api.grd0.local.crt /etc/ssl/certs/api.grd0.local.key
+}
