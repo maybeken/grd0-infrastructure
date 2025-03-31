@@ -1,0 +1,3 @@
+[submodule "grd0-site/src"]
+	path = grd0-site/src
+	url = git@gitlab.com:grd0.net/grd0-site-monorepo.git
