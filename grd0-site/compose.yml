@@ -10,7 +10,8 @@ services:
     env_file:
       - api.env
     volumes:
-      - ./data:/opt/app/data
+      - ./data/files:/opt/app/data/files
+      - data:/opt/app/data
     restart: unless-stopped
 
   caddy:
@@ -29,7 +30,7 @@ services:
       - cloudflared.env
 
 volumes:
-  certs:
+  data:
 
 networks:
   default:
