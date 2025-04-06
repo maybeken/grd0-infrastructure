@@ -1,6 +1,6 @@
 services:
-  web:
-    image: ghcr.io/hoarder-app/hoarder:${HOARDER_VERSION:-release}
+  app:
+    image: ghcr.io/karakeep-app/karakeep:${HOARDER_VERSION:-release}
     restart: unless-stopped
     volumes:
       - data:/data
@@ -32,6 +32,7 @@ services:
       - --remote-debugging-address=0.0.0.0
       - --remote-debugging-port=9222
       - --hide-scrollbars
+
   meilisearch:
     image: getmeili/meilisearch:v1.11.1
     restart: unless-stopped

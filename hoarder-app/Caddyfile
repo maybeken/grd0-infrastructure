@@ -1,5 +1,5 @@
 :443 {
-	reverse_proxy web:3000
+	reverse_proxy app:3000
 
 	tls /etc/ssl/certs/hoarder.local.crt /etc/ssl/certs/hoarder.local.key
 }
