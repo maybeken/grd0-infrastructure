@@ -43,28 +43,11 @@ services:
     volumes:
       - meilisearch:/meili_data
 
-  self-sign:
-    image: paulczar/omgwtfssl
-    restart: "no"
-    volumes:
-      - certs:/certs
-    environment:
-      - SSL_SUBJECT=hoarder.local
-      - CA_SUBJECT=admin@grd0.net
-      - SSL_KEY=/certs/hoarder.local.key
-      - SSL_CSR=/certs/hoarder.local.csr
-      - SSL_CERT=/certs/hoarder.local.crt
-
   caddy:
     image: caddy:alpine
     restart: unless-stopped
-    # ports:
-    #   - 8443:443
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
-      - certs:/etc/ssl/certs:z,ro
-    depends_on:
-      - self-sign
 
   tunnel:
     image: cloudflare/cloudflared
@@ -89,5 +72,4 @@ services:
 volumes:
   meilisearch:
   data:
-  certs:
   ollama:
