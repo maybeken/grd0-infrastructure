@@ -13,26 +13,11 @@ services:
       - ./data:/opt/app/data
     restart: unless-stopped
 
-  self-sign:
-    image: paulczar/omgwtfssl
-    restart: "no"
-    volumes:
-      - certs:/certs
-    environment:
-      - SSL_SUBJECT=api.grd0.local
-      - CA_SUBJECT=admin@grd0.net
-      - SSL_KEY=/certs/api.grd0.local.key
-      - SSL_CSR=/certs/api.grd0.local.csr
-      - SSL_CERT=/certs/api.grd0.local.crt
-
   caddy:
     image: caddy:alpine
     restart: unless-stopped
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
-      - certs:/etc/ssl/certs:z,ro
-    depends_on:
-      - self-sign
 
   tunnel:
     image: cloudflare/cloudflared
