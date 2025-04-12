@@ -31,6 +31,14 @@ services:
       - db.env
       - s3.env
 
+  collabora:
+    image: collabora/code
+    restart: always
+    environment:
+      - domain=docs.grd0.net
+      - server_name=docs.grd0.net
+      - dictionaries=en,zh
+
   caddy:
     image: caddy:alpine
     restart: unless-stopped

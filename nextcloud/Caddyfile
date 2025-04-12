@@ -34,12 +34,6 @@
 	#	reverse_proxy unix//run/notify_push/notify_push.sock # I love Unix sockets, but you can do :7867 also
 	#}
 
-	#handle_path /onlyoffice/* {
-	#	reverse_proxy {$ONLYOFFICE_IP}:{$ONLYOFFICE_PORT} {
-	#		header_up X-Forwarded-Host {host}/onlyoffice
-	#	}
-	#}
-
 	php_fastcgi app:9000 {
 		root /var/www/html # This is needed because inside the container the root directory is different from the one I put in the "root" directive of this Caddyfile. If you don't change this, php-fpm will not be able to find the files to process.
 		env front_controller_active true # Enable pretty urls
