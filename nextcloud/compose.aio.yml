@@ -20,6 +20,8 @@ services:
       - smtp
     volumes:
       - nextcloud:/var/www/html:z
+    post_start:
+      - command: ["apk", "add", "ffmpeg", "nodejs"]
     environment:
       - POSTGRES_HOST=db
       - REDIS_HOST=redis
