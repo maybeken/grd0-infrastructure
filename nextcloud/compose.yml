@@ -20,6 +20,9 @@ services:
       - smtp
     volumes:
       - nextcloud:/var/www/html:z
+      - /home/cloud/storage/nextcloud/config:/var/www/html/config:z
+      - /home/cloud/storage/nextcloud/custom_apps:/var/www/html/custom_apps:z
+      - /home/cloud/storage/nextcloud/data:/var/www/html/data:z
     post_start:
       - command: ["apk", "add", "ffmpeg", "nodejs"]
     environment:
@@ -31,7 +34,6 @@ services:
       - SMTP_PORT=2525
     env_file:
       - db.env
-      - s3.env
 
   collabora:
     image: collabora/code
@@ -57,21 +59,15 @@ services:
     restart: always
     volumes:
       - nextcloud:/var/www/html:z
+      - /home/cloud/storage/nextcloud/config:/var/www/html/config:z
+      - /home/cloud/storage/nextcloud/custom_apps:/var/www/html/custom_apps:z
+      - /home/cloud/storage/nextcloud/data:/var/www/html/data:z
       # NOTE: The `volumes` config of the `cron` and `app` containers must match
     entrypoint: /cron.sh
     depends_on:
       - db
       - redis
 
-  tunnel:
-    image: cloudflare/cloudflared
-    restart: unless-stopped
-    command: tunnel run
-    environment:
-      - TUNNEL_EDGE_IP_VERSION=auto
-    env_file:
-      - cloudflared.env
-  
   smtp:
     image: kostyaesmukov/smtp_to_telegram
     restart: always
