@@ -1,4 +1,6 @@
-cloud.ocelot-newton.ts.net:8443 {
+nextcloud.ocelot-newton.ts.net:8443 {
+	bind tailscale/nextcloud
+
 	encode zstd gzip
 	root * /var/www/html
 
