@@ -2,7 +2,6 @@ services:
   db:
     image: docker.io/library/postgres:17-alpine
     restart: always
-    userns_mode: "keep-id:uid=1000,gid=1000"
     volumes:
       - db:/var/lib/postgresql/data:z
     env_file:
@@ -24,7 +23,6 @@ services:
       - /home/cloud/storage/nextcloud/config:/var/www/html/config:z
       - /home/cloud/storage/nextcloud/custom_apps:/var/www/html/custom_apps:z
       - /home/cloud/storage/nextcloud/data:/var/www/html/data:z
-    userns_mode: "keep-id:uid=1000,gid=1000"
     post_start:
       - command: ["apk", "add", "ffmpeg", "nodejs"]
     environment:
@@ -61,7 +59,6 @@ services:
   cron:
     image: docker.io/library/nextcloud:fpm-alpine
     restart: always
-    userns_mode: "keep-id:uid=1000,gid=1000"
     volumes:
       - nextcloud:/var/www/html:z
       - /home/cloud/storage/nextcloud/config:/var/www/html/config:z
