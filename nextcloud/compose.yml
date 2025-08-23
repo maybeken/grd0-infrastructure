@@ -44,7 +44,7 @@ services:
       - dictionaries=en,zh
 
   caddy:
-    image: docker.io/caddy:alpine
+    image: ghcr.io/tailscale/caddy-tailscale
     restart: unless-stopped
     ports:
       - 8443:8443
@@ -55,6 +55,8 @@ services:
       - ./Caddyfile:/etc/caddy/Caddyfile
     volumes_from:
       - app
+    environment:
+      - TS_AUTHKEY=${TS_AUTHKEY}
 
   cron:
     image: docker.io/library/nextcloud:fpm-alpine
