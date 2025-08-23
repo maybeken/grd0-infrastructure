@@ -1,4 +1,4 @@
-cloud.ocelot-newton.ts.net:443 {
+cloud.ocelot-newton.ts.net:8443 {
 	encode zstd gzip
 	root * /var/www/html
 
