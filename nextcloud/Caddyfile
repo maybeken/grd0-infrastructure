@@ -1,8 +1,4 @@
-:443 {
-	tls internal {
-		on_demand
-	}
-
+cloud.ocelot-newton.ts.net:443 {
 	encode zstd gzip
 	root * /var/www/html
 
