@@ -44,10 +44,8 @@ services:
       - dictionaries=en,zh
 
   caddy:
-    image: ghcr.io/tailscale/caddy-tailscale
+    image: ghcr.io/tailscale/caddy-tailscale:main
     restart: unless-stopped
-    ports:
-      - 8443:8443
     depends_on:
       - app
     volumes:

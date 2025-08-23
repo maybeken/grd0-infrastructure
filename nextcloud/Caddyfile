@@ -1,5 +1,9 @@
-nextcloud.ocelot-newton.ts.net:8443 {
+:443 {
 	bind tailscale/nextcloud
+
+	tls {
+		get_certificate tailscale
+	}
 
 	encode zstd gzip
 	root * /var/www/html
