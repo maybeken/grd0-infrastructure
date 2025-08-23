@@ -12,7 +12,9 @@ services:
     restart: always
 
   app:
-    image: docker.io/library/nextcloud:fpm-alpine
+    image: grd0.net/nextcloud:fpm-alpine
+    build:
+      dockerfile: Dockerfile
     restart: always
     depends_on:
       - redis
@@ -23,10 +25,6 @@ services:
       - /home/cloud/storage/nextcloud/config:/var/www/html/config:z
       - /home/cloud/storage/nextcloud/custom_apps:/var/www/html/custom_apps:z
       - /home/cloud/storage/nextcloud/data:/var/www/html/data:z
-    post_start:
-      - command: ["apk", "add", "ffmpeg", "nodejs", "shadow"]
-      - command: ["groupmod", "--gid 1000", "www-data"]
-      - command: ["usermod", "--uid 1000", "www-data"]
     environment:
       - POSTGRES_HOST=db
       - REDIS_HOST=redis
@@ -59,12 +57,10 @@ services:
       - TS_AUTHKEY=${TS_AUTHKEY}
 
   cron:
-    image: docker.io/library/nextcloud:fpm-alpine
+    image: grd0.net/nextcloud:fpm-alpine
+    build:
+      dockerfile: Dockerfile
     restart: always
-    post_start:
-      - command: ["apk", "add", "ffmpeg", "nodejs", "shadow"]
-      - command: ["groupmod", "--gid 1000", "www-data"]
-      - command: ["usermod", "--uid 1000", "www-data"]
     volumes:
       - nextcloud:/var/www/html:z
       - /home/cloud/storage/nextcloud/config:/var/www/html/config:z
