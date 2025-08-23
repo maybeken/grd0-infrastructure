@@ -46,6 +46,8 @@ services:
   caddy:
     image: docker.io/caddy:alpine
     restart: unless-stopped
+    ports:
+      - 443:443
     depends_on:
       - app
     volumes:
