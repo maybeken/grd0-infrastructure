@@ -1,7 +1,3 @@
-tailscale {
-	ephemeral true
-}
-
 :443 {
 	bind tailscale/nextcloud
 
