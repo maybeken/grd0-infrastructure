@@ -1,7 +1,9 @@
+tailscale {
+	ephemeral true
+}
+
 :443 {
 	bind tailscale/nextcloud
-
-	ephemeral true
 
 	tls {
 		get_certificate tailscale
