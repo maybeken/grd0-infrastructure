@@ -1,6 +1,6 @@
 services:
   app:
-    image: ghcr.io/karakeep-app/karakeep:${HOARDER_VERSION:-release}
+    image: ghcr.io/karakeep-app/karakeep:${KARAKEEP_VERSION:-release}
     restart: unless-stopped
     volumes:
       - data:/data
@@ -33,7 +33,7 @@ services:
       - --hide-scrollbars
 
   meilisearch:
-    image: getmeili/meilisearch:v1.11.1
+    image: getmeili/meilisearch:v1.13.3
     restart: unless-stopped
     env_file:
       - .env
