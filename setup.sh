@@ -19,11 +19,3 @@ echo \
 
 sudo apt update
 sudo apt install -y htop docker-ce rsync docker-compose-plugin
-
-sudo modprobe nfs 
-sudo modprobe nfsd
-sudo modprobe rpcsec_gss_krb5
-
-echo nfs | sudo tee -a /etc/modules
-echo nfsd | sudo tee -a /etc/modules
-echo rpcsec_gss_krb5 | sudo tee -a /etc/modules
