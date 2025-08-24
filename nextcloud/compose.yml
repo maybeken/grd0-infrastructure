@@ -14,7 +14,7 @@ services:
   app:
     image: grd0.net/nextcloud:fpm-alpine
     build:
-      dockerfile: api/Dockerfile
+      dockerfile: Dockerfile
     restart: always
     depends_on:
       - redis
@@ -54,7 +54,7 @@ services:
   cron:
     image: grd0.net/nextcloud:fpm-alpine
     build:
-      dockerfile: api/Dockerfile
+      dockerfile: Dockerfile
     restart: always
     volumes:
       - nextcloud:/var/www/html:z
