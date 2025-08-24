@@ -12,7 +12,9 @@ services:
     restart: always
 
   app:
-    image: docker.io/library/nextcloud:fpm-alpine
+    image: grd0.net/nextcloud:fpm-alpine
+    build:
+      dockerfile: api/Dockerfile
     restart: always
     depends_on:
       - redis
@@ -20,8 +22,6 @@ services:
       - smtp
     volumes:
       - nextcloud:/var/www/html:z
-    post_start:
-      - command: ["apk", "add", "ffmpeg", "nodejs"]
     environment:
       - POSTGRES_HOST=db
       - REDIS_HOST=redis
@@ -53,7 +53,9 @@ services:
       - app
 
   cron:
-    image: nextcloud:fpm-alpine
+    image: grd0.net/nextcloud:fpm-alpine
+    build:
+      dockerfile: api/Dockerfile
     restart: always
     volumes:
       - nextcloud:/var/www/html:z
