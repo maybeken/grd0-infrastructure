@@ -36,7 +36,7 @@ services:
     image: getmeili/meilisearch:v1.11.1
     restart: unless-stopped
     env_file:
-      - .env
+      - karakeep.env
     environment:
       MEILI_NO_ANALYTICS: "true"
     volumes:
