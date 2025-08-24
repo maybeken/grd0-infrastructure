@@ -69,6 +69,27 @@ The `docker-compose.yml` file defines the following services:
 - **nextcloud**: A self-hosted cloud storage solution.
 - **vaultwarden**: A lightweight Bitwarden-compatible password manager.
 
+## Migration of Data
+
+### Install Utility
+
+```sh
+sudo curl -SL https://raw.githubusercontent.com/junedkhatri31/docker-volume-snapshot/main/docker-volume-snapshot -o /usr/local/bin/docker-volume-snapshot
+sudo chmod +x /usr/local/bin/docker-volume-snapshot
+```
+
+### At Source
+
+```sh
+read -p "Enter volume name: " vname && sudo docker-volume-snapshot create ${vname} ${vname}.tar.gz
+```
+
+### At Desintation
+
+```sh
+read -p "Enter volume name: " vname && sudo docker-volume-snapshot restore ${vname}.tar.gz ${vname}
+```
+
 ## License
 
 This project is licensed under the [CC-BY-SA-4.0](https://creativecommons.org/licenses/by-sa/4.0/) license.
