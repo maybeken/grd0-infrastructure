@@ -1,5 +1,5 @@
 :443 {
-	bind tailscale/passport
+	bind tailscale/password
 
 	tls {
     	get_certificate tailscale
