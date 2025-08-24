@@ -5,7 +5,7 @@ services:
     volumes:
       - data:/data
     env_file:
-      - openai.env
+      - .env
     environment:
       MEILI_ADDR: http://meilisearch:7700
       BROWSER_WEB_URL: http://chrome:9222
@@ -36,7 +36,7 @@ services:
     image: getmeili/meilisearch:v1.11.1
     restart: unless-stopped
     env_file:
-      - karakeep.env
+      - .env
     environment:
       MEILI_NO_ANALYTICS: "true"
     volumes:
