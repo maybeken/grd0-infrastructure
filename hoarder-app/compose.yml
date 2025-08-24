@@ -18,9 +18,9 @@ services:
       OCR_LANGS: eng, chi_tra, chi_sim
       DATA_DIR: /data
       DISABLE_SIGNUPS: false
-    depends_on: 
+    depends_on:
       - meilisearch
-    
+
   chrome:
     image: gcr.io/zenika-hub/alpine-chrome:124
     restart: unless-stopped
@@ -33,7 +33,7 @@ services:
       - --hide-scrollbars
 
   meilisearch:
-    image: getmeili/meilisearch:v1.13.3
+    image: getmeili/meilisearch:v1.11.1
     restart: unless-stopped
     env_file:
       - karakeep.env
