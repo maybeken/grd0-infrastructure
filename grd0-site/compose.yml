@@ -10,8 +10,8 @@ services:
     env_file:
       - api.env
     volumes:
+      - ./data/api.db:/opt/app/data/api.db
       - ./data/files:/opt/app/data/files
-      - data:/opt/app/data
     restart: unless-stopped
 
   caddy:
@@ -28,9 +28,6 @@ services:
       - TUNNEL_EDGE_IP_VERSION=auto
     env_file:
       - cloudflared.env
-
-volumes:
-  data:
 
 networks:
   default:
