@@ -13,21 +13,14 @@ services:
       - data:/data/
 
   caddy:
-    image: caddy:alpine
+    image: ghcr.io/tailscale/caddy-tailscale:main
     restart: unless-stopped
     depends_on:
       - vaultwarden
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
-
-  tunnel:
-    image: cloudflare/cloudflared
-    restart: unless-stopped
-    command: tunnel run
-    environment:
-      - TUNNEL_EDGE_IP_VERSION=auto
     env_file:
-      - cloudflared.env
+      - tailscale.env
 
 volumes:
   data:
