@@ -15,6 +15,7 @@ services:
       INFERENCE_CONTEXT_LENGTH: 2048
       INFERENCE_JOB_TIMEOUT_SEC: 300
       CRAWLER_FULL_PAGE_SCREENSHOT: true
+      CRAWLER_STORE_PDF: true
       OCR_LANGS: eng, chi_tra, chi_sim
       DATA_DIR: /data
       DISABLE_SIGNUPS: false
