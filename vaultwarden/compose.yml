@@ -4,7 +4,7 @@ services:
     container_name: vaultwarden
     restart: unless-stopped
     environment:
-      DOMAIN: ""
+      DOMAIN: ${DOMAIN}
       ADMIN_TOKEN: ""
       DISABLE_ADMIN_TOKEN: true
       SIGNUPS_ALLOWED: false
