@@ -2,7 +2,7 @@
 	bind tailscale/password
 
 	tls {
-    	get_certificate tailscale
+		get_certificate tailscale
 	}
 	
 	reverse_proxy vaultwarden:80
