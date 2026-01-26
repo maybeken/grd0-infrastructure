@@ -1,4 +1,10 @@
 :443 {
+	bind tailscale/password
+
+	tls {
+    	get_certificate tailscale
+	}
+	
 	reverse_proxy vaultwarden:80
 
 	tls internal {
