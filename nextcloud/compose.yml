@@ -46,10 +46,9 @@ services:
 
   whiteboard:
     image: ghcr.io/nextcloud-releases/whiteboard:stable
-    ports:
-      - "3002:3002"
     environment:
       STORAGE_STRATEGY: lru
+      MAX_UPLOAD_FILE_SIZE: 10
     env_file:
       - whiteboard.env
 
