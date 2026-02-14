@@ -44,6 +44,15 @@ services:
       - server_name=docs.grd0.net
       - dictionaries=en,zh
 
+  whiteboard:
+    image: ghcr.io/nextcloud-releases/whiteboard:stable
+    ports:
+      - "3002:3002"
+    environment:
+      STORAGE_STRATEGY: lru
+    env_file:
+      - whiteboard.env
+
   caddy:
     image: caddy:alpine
     restart: unless-stopped
