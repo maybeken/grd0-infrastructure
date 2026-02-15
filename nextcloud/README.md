@@ -41,6 +41,13 @@ CLUSTER_HOST_SUBNET=
 CLUSTER_PRIMARY_HOST=
 ```
 
+### whiteboard.env
+
+```env
+NEXTCLOUD_URL=
+JWT_SECRET_KEY=
+```
+
 ### s3.env
 
 ```env
