@@ -11,6 +11,10 @@
 	redir /.well-known/caldav /remote.php/dav 301
 	redir /.well-known/* /index.php{uri} 301 # Nextcloud front-controller handles routes to /.well-known
 	redir /remote/* /remote.php{uri} 301
+	
+	handle_path /whiteboard/* {
+		reverse_proxy http://whiteboard:3002
+	}
 
 	# Secure headers, all from .htaccess except Permissions-Policy, STS and X-Powered-By
 	header {
