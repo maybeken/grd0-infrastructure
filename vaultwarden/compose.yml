@@ -29,7 +29,7 @@ services:
       - vaultwarden
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
-      - $PWD/tmp/tailscaled.sock:/var/run/tailscale/tailscaled.sock
+      - $PWD/tmp/tailscaled.sock:/var/run/tailscale/tailscaled.sock # Ref: https://blog.moospirit.org/post/2024/caddy-tailscale-docker/
     network_mode:
       service:tailscale
 
