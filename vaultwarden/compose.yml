@@ -12,15 +12,24 @@ services:
     volumes:
       - data:/data/
 
+  tailscale:
+    image: tailscale/tailscale:latest
+    restart: unless-stopped
+    hostname: password
+    volumes:
+      - ${PWD}/tailscale/tmp:/tmp
+    env_file:
+      - tailscale.env
+
   caddy:
-    image: ghcr.io/tailscale/caddy-tailscale:main
+    image: caddy:alpine
     restart: unless-stopped
     depends_on:
+      - tailscale
       - vaultwarden
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
-    env_file:
-      - tailscale.env
+      - $PWD/tailscale/tmp/tailscaled.sock:/var/run/tailscale/tailscaled.sock
 
 volumes:
   data:
