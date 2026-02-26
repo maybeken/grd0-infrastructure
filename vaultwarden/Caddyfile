@@ -1,6 +1,4 @@
 :443 {
-	bind tailscale/password
-
 	tls {
 		get_certificate tailscale
 	}
