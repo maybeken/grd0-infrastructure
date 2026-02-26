@@ -17,7 +17,7 @@ services:
     restart: unless-stopped
     hostname: password
     volumes:
-      - ${PWD}/tailscaled.sock:/tmp/tailscale/tmp/tailscaled.sock
+      - ${PWD}/tailscaled.sock:/tmp/tailscaled.sock
     env_file:
       - tailscale.env
 
