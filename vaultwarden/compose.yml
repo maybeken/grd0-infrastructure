@@ -17,7 +17,7 @@ services:
     restart: unless-stopped
     hostname: password
     volumes:
-      - ${PWD}/tailscale/tmp:/tmp
+      - ${PWD}/tailscaled.sock:/tmp/tailscale/tmp/tailscaled.sock
     env_file:
       - tailscale.env
 
@@ -29,7 +29,9 @@ services:
       - vaultwarden
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
-      - $PWD/tailscale/tmp/tailscaled.sock:/var/run/tailscale/tailscaled.sock
+      - $PWD/tailscaled.sock:/var/run/tailscale/tailscaled.sock
+    network_mode:
+      service:tailscale
 
 volumes:
   data:
