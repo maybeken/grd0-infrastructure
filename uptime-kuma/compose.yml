@@ -1,6 +1,6 @@
 services:
   uptime-kuma:
-    image: louislam/uptime-kuma:latest
+    image: ghcr.io/louislam/uptime-kuma:next-slim
     container_name: uptime-kuma
     restart: always
     volumes:
