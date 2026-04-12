@@ -22,10 +22,10 @@ services:
       - smtp
     volumes:
       - nextcloud:/var/www/html:z
-      - /root/app/nextcloud/config:/var/www/html/config
-      - /root/storage/nextcloud/data:/var/www/html/data
-      - /root/app/nextcloud/themes:/var/www/html/themes
-      - /root/app/nextcloud/custom_apps:/var/www/html/custom_apps
+      - /mnt/nextcloud-data/config:/var/www/html/config
+      - /mnt/nextcloud-data/data:/var/www/html/data
+      - /mnt/nextcloud-data/themes:/var/www/html/themes
+      - /mnt/nextcloud-data/custom_apps:/var/www/html/custom_apps
     environment:
       - POSTGRES_HOST=db
       - REDIS_HOST=redis
@@ -70,10 +70,10 @@ services:
     restart: always
     volumes:
       - nextcloud:/var/www/html:z
-      - /root/app/nextcloud/config:/var/www/html/config
-      - /root/storage/nextcloud/data:/var/www/html/data
-      - /root/app/nextcloud/themes:/var/www/html/themes
-      - /root/app/nextcloud/custom_apps:/var/www/html/custom_apps
+      - /mnt/nextcloud-data/config:/var/www/html/config
+      - /mnt/nextcloud-data/data:/var/www/html/data
+      - /mnt/nextcloud-data/themes:/var/www/html/themes
+      - /mnt/nextcloud-data/custom_apps:/var/www/html/custom_apps
       # NOTE: The `volumes` config of the `cron` and `app` containers must match
     entrypoint: /cron.sh
     depends_on:
