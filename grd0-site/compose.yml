@@ -10,8 +10,8 @@ services:
     env_file:
       - api.env
     volumes:
-      - ./data/api.db:/opt/app/data/api.db
-      - ./data/files:/opt/app/data/files
+      - /mnt/app-data/grd0-site/api.db:/opt/app/data/api.db
+      - /mnt/app-data/grd0-site/files:/opt/app/data/files
     restart: unless-stopped
 
   caddy:
