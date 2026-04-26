@@ -33,6 +33,13 @@ services:
       - TRUSTED_PROXIES=${NEXTCLOUD_TRUSTED_PROXIES}
       - SMTP_HOST=smtp
       - SMTP_PORT=2525
+      - PHP_MEMORY_LIMIT=1024M
+      - PHP_UPLOAD_LIMIT=1024M
+      - PHP_OPCACHE_MEMORY_CONSUMPTION=512M
+      - PHP_FPM_PM_MAX_CHILDREN=120
+      - PHP_FPM_PM_START_SERVERS=12
+      - PHP_FPM_PM_MIN_SPARE_SERVERS=6
+      - PHP_FPM_PM_MAX_SPARE_SERVERS=18
     env_file:
       - db.env
 
@@ -75,6 +82,8 @@ services:
       - /mnt/nextcloud-data/themes:/var/www/html/themes
       - /mnt/nextcloud-data/custom_apps:/var/www/html/custom_apps
       # NOTE: The `volumes` config of the `cron` and `app` containers must match
+    environment:
+      - PHP_MEMORY_LIMIT=1024M
     entrypoint: /cron.sh
     depends_on:
       - db
