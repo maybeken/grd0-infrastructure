@@ -26,6 +26,7 @@ services:
       - /mnt/nextcloud-data/data:/var/www/html/data
       - /mnt/nextcloud-data/themes:/var/www/html/themes
       - /mnt/nextcloud-data/custom_apps:/var/www/html/custom_apps
+      - ./php-fpm/nextcloud.conf:/usr/local/etc/php-fpm.d/nextcloud.conf:ro
     environment:
       - POSTGRES_HOST=db
       - REDIS_HOST=redis
@@ -36,10 +37,6 @@ services:
       - PHP_MEMORY_LIMIT=1024M
       - PHP_UPLOAD_LIMIT=1024M
       - PHP_OPCACHE_MEMORY_CONSUMPTION=512M
-      - PHP_FPM_PM_MAX_CHILDREN=120
-      - PHP_FPM_PM_START_SERVERS=12
-      - PHP_FPM_PM_MIN_SPARE_SERVERS=6
-      - PHP_FPM_PM_MAX_SPARE_SERVERS=18
     env_file:
       - db.env
 
