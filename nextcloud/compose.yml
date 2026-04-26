@@ -26,7 +26,7 @@ services:
       - /mnt/nextcloud-data/data:/var/www/html/data
       - /mnt/nextcloud-data/themes:/var/www/html/themes
       - /mnt/nextcloud-data/custom_apps:/var/www/html/custom_apps
-      - ./php-fpm/nextcloud.conf:/usr/local/etc/php-fpm.d/nextcloud.conf:ro
+      - ./php-fpm/www.conf:/usr/local/etc/php-fpm.d/www.conf:ro
     environment:
       - POSTGRES_HOST=db
       - REDIS_HOST=redis
