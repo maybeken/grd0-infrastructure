@@ -1,0 +1,13 @@
+services:
+  proxy:
+    image: grd0.net/nextcloud-proxy
+    build:
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "8088:8088"
+
+networks:
+  default:
+    name: nextcloud_default
+    external: true
