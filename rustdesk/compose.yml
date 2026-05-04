@@ -1,0 +1,51 @@
+services:
+  hbbs:
+    container_name: hbbs
+    image: rustdesk/rustdesk-server:latest
+    command: hbbs
+    volumes:
+      - data:/root
+    network_mode: service:tailscale
+    depends_on:
+      - tailscale
+      - hbbr
+    restart: unless-stopped
+
+  hbbr:
+    container_name: hbbr
+    image: rustdesk/rustdesk-server:latest
+    command: hbbr
+    volumes:
+      - data:/root
+    network_mode: service:tailscale
+    depends_on:
+      - tailscale
+    restart: unless-stopped
+
+  web:
+    image: caddy:alpine
+    network_mode: service:tailscale
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - data:/root
+    depends_on:
+      - hbbs
+      - tailscale
+
+  tailscale:
+    image: tailscale/tailscale:latest
+    restart: unless-stopped
+    hostname: rustdesk
+    environment:
+      - TS_STATE_DIR=/var/lib/tailscale
+    volumes:
+      - ${PWD}/tmp:/var/lib/tailscale
+    env_file:
+      - tailscale.env
+
+volumes:
+  data:
+
+networks:
+  default:
+    enable_ipv6: true

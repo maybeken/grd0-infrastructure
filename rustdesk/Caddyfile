@@ -1,0 +1,19 @@
+:80 {
+	handle / {
+		redir id_ed25519.pub
+	}
+
+	handle /*.pub {
+		header Content-Type text/plain
+		header Content-Disposition inline
+
+		file_server {
+			root /root
+		}
+	}
+
+	handle {
+		respond 404
+		respond "Not Found"
+	}
+}
