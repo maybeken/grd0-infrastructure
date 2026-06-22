@@ -40,13 +40,11 @@ services:
     env_file:
       - db.env
 
-  collabora:
-    image: collabora/code
+  office:
+    image: ghcr.io/euro-office/documentserver:latest
     restart: always
     environment:
-      - domain=docs.grd0.net
-      - server_name=docs.grd0.net
-      - dictionaries=en,zh
+      - JWT_SECRET=${OFFICE_JWT_SECRET}
 
   whiteboard:
     image: ghcr.io/nextcloud-releases/whiteboard:stable
