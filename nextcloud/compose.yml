@@ -75,7 +75,7 @@ services:
       - app
     volumes:
       - nextcloud:/var/www/html:z,ro
-      - ./Caddyfile:/etc/caddy/Caddyfile
+      - ./tailscale/Caddyfile:/etc/caddy/Caddyfile
       - $PWD/tmp/tailscaled.sock:/var/run/tailscale/tailscaled.sock # Ref: https://blog.moospirit.org/post/2024/caddy-tailscale-docker/
     network_mode:
       service:tailscale

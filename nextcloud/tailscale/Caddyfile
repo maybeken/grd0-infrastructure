@@ -1,0 +1,77 @@
+:443 {
+	tls {
+		get_certificate tailscale
+	}
+
+	encode zstd gzip
+	root * /var/www/html
+
+	# Rules here are all from .htaccess
+	redir /.well-known/carddav /remote.php/dav 301
+	redir /.well-known/caldav /remote.php/dav 301
+	redir /.well-known/* /index.php{uri} 301 # Nextcloud front-controller handles routes to /.well-known
+	redir /remote/* /remote.php{uri} 301
+
+	handle_path /whiteboard/* {
+		reverse_proxy http://whiteboard:3002
+	}
+
+	# Secure headers, all from .htaccess except Permissions-Policy, STS and X-Powered-By
+	header {
+		Strict-Transport-Security max-age=15768000
+		Permissions-Policy interest-cohort=()
+		X-Content-Type-Options nosniff
+		X-Frame-Options SAMEORIGIN
+		Referrer-Policy no-referrer
+		X-XSS-Protection "1; mode=block"
+		X-Permitted-Cross-Domain-Policies none
+		X-Robots-Tag "noindex, nofollow"
+		-X-Powered-By
+		Content-Security-Policy "
+			default-src 'self' grd0.net *.grd0.net;
+			frame-ancestors 'none';
+		"
+	}
+
+	# Uncomment this block if you use the high speed files backend: https://github.com/nextcloud/notify_push
+	#handle_path /push/* {
+	#	reverse_proxy unix//run/notify_push/notify_push.sock # I love Unix sockets, but you can do :7867 also
+	#}
+
+	php_fastcgi app:9000 {
+		root /var/www/html # This is needed because inside the container the root directory is different from the one I put in the "root" directive of this Caddyfile. If you don't change this, php-fpm will not be able to find the files to process.
+		env front_controller_active true # Enable pretty urls
+		env modHeadersAvailable true # Avoid sending the security headers twice
+
+		trusted_proxies 173.245.48.0/20 103.21.244.0/22 103.22.200.0/22 103.31.4.0/22 141.101.64.0/18 108.162.192.0/18 190.93.240.0/20 188.114.96.0/20 197.234.240.0/22 198.41.128.0/17 162.158.0.0/15 104.16.0.0/13 104.24.0.0/14 172.64.0.0/13 131.0.72.0/22
+		header_up X-Forwarded-For {http.request.header.CF-Connecting-IP}
+	}
+
+	# From .htaccess, deny access to sensible files and directories
+	@forbidden {
+		path /build/* /tests/* /config/* /lib/* /3rdparty/* /templates/* /data/*
+		path /.* /autotest* /occ* /issue* /indie* /db_* /console*
+		not path /.well-known/*
+	}
+	error @forbidden 404
+
+	# From .htaccess, set cache for versioned static files (cache-busting)
+	@immutable {
+		path *.css *.js *.mjs *.svg *.gif *.png *.jpg *.ico *.wasm *.tflite
+		query v=*
+	}
+	header @immutable Cache-Control "max-age=15778463, immutable"
+
+	# From .htaccess, set cache for normal static files
+	@static {
+		path *.css *.js *.mjs *.svg *.gif *.png *.jpg *.ico *.wasm *.tflite
+		not query v=*
+	}
+	header @static Cache-Control "max-age=15778463"
+
+	# From .htaccess, cache fonts for 1 week
+	@woff2 path *.woff2
+	header @woff2 Cache-Control "max-age=604800"
+
+	file_server
+}
