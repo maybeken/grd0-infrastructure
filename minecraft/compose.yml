@@ -20,12 +20,13 @@ services:
       WHITELIST_FILE: "./whitelist.txt"
       PLAYER_IDLE_TIMEOUT: "600"
       ANNOUNCE_PLAYER_ACHIEVEMENTS: "true"
+    network_mode:
+      service:playit
     volumes:
       - /mnt/app-data/minecraft/sf5:/data
 
   playit:
     image: ghcr.io/playit-cloud/playit-agent
-    network_mode: host
     environment:
       - SECRET_KEY=${SECRET_KEY}
 
