@@ -9,8 +9,8 @@ services:
       INIT_MEMORY: 3G
       MAX_MEMORY: 8ZG
       MAX_PLAYERS: "8"
-      ICON: "./icon.png"
-      OVERRIDE_ICON: "true"
+      # ICON: "./icon.png"
+      # OVERRIDE_ICON: "true"
       USE_MEOWICE_FLAGS: "true"
       DIFFICULTY: "2"
       SIMULATION_DISTANCE: "8"
