@@ -111,7 +111,7 @@ services:
     tailscale:
     image: tailscale/tailscale:latest
     restart: unless-stopped
-    hostname: password
+    hostname: cloud
     volumes:
       - ${PWD}/tmp:/tmp
     env_file:
