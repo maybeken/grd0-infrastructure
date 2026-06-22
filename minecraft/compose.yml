@@ -7,7 +7,7 @@ services:
       TYPE: FORGE
       FORGE_VERSION: 47.4.0
       INIT_MEMORY: 3G
-      MAX_MEMORY: 8G
+      MAX_MEMORY: 8ZG
       MAX_PLAYERS: "8"
       ICON: "./icon.png"
       OVERRIDE_ICON: "true"
@@ -23,14 +23,11 @@ services:
     volumes:
       - /mnt/app-data/minecraft/sf5:/data
 
-  tunnel:
-    image: cloudflare/cloudflared
-    restart: unless-stopped
-    command: tunnel run
+  playit:
+    image: ghcr.io/playit-cloud/playit-agent
+    network_mode: host
     environment:
-      - TUNNEL_EDGE_IP_VERSION=auto
-    env_file:
-      - cloudflared.env
+      - SECRET_KEY=${SECRET_KEY}
 
 networks:
   default:
