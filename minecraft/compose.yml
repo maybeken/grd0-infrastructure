@@ -1,5 +1,7 @@
 services:
   mc:
+    tty: true
+    stdin_open: true
     image: itzg/minecraft-server:java17-alpine
     environment:
       EULA: "TRUE"
