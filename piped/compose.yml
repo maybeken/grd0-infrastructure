@@ -1,0 +1,60 @@
+services:
+  piped:
+    image: 1337kavin/piped:latest
+    restart: unless-stopped
+    volumes:
+      - ./config.properties:/app/config.properties
+    environment:
+      PORT: 8080
+      HTTP_WORKERS: 2
+      HIBERNATE__CONNECTION__URL: jdbc:postgresql://postgres:5432/piped
+    env_file:
+      - db.env
+    depends_on:
+      - postgres
+  
+  frontend:
+    image: 1337kavin/piped-frontend:latest
+    restart: unless-stopped
+    depends_on:
+      - piped
+    environment:
+      BACKEND_HOSTNAME: piped-api.grd0.net
+      HTTP_MODE: https
+
+  piped-proxy:
+    image: 1337kavin/piped-proxy:latest
+    restart: unless-stopped
+    volumes:
+      - piped-proxy:/app/socket
+
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    volumes:
+      - db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=piped
+    env_file:
+      - db.env
+
+  bg-helper:
+    image: 1337kavin/bg-helper-server:latest
+    restart: unless-stopped
+
+  tunnel:
+    image: cloudflare/cloudflared
+    restart: unless-stopped
+    command: tunnel run
+    environment:
+      - TUNNEL_EDGE_IP_VERSION=auto
+    env_file:
+      - cloudflared.env
+
+volumes:
+  db:
+  piped-proxy:
+
+networks:
+  default:
+    enable_ipv6: true

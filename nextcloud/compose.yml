@@ -22,10 +22,11 @@ services:
       - smtp
     volumes:
       - nextcloud:/var/www/html:z
-      - /root/app/nextcloud/config:/var/www/html/config
-      - /root/storage/nextcloud/data:/var/www/html/data
-      - /root/app/nextcloud/themes:/var/www/html/themes
-      - /root/app/nextcloud/custom_apps:/var/www/html/custom_apps
+      - /mnt/nextcloud-data/config:/var/www/html/config
+      - /mnt/nextcloud-data/data:/var/www/html/data
+      - /mnt/nextcloud-data/themes:/var/www/html/themes
+      - /mnt/nextcloud-data/custom_apps:/var/www/html/custom_apps
+      - ./php-fpm/www.conf:/usr/local/etc/php-fpm.d/www.conf:ro
     environment:
       - POSTGRES_HOST=db
       - REDIS_HOST=redis
@@ -33,6 +34,9 @@ services:
       - TRUSTED_PROXIES=${NEXTCLOUD_TRUSTED_PROXIES}
       - SMTP_HOST=smtp
       - SMTP_PORT=2525
+      - PHP_MEMORY_LIMIT=1024M
+      - PHP_UPLOAD_LIMIT=1024M
+      - PHP_OPCACHE_MEMORY_CONSUMPTION=512M
     env_file:
       - db.env
 
@@ -63,6 +67,19 @@ services:
     volumes_from:
       - app
 
+  caddy-ts:
+    image: caddy:alpine
+    restart: unless-stopped
+    depends_on:
+      - tailscale
+      - app
+    volumes:
+      - nextcloud:/var/www/html:z,ro
+      - ./tailscale/Caddyfile:/etc/caddy/Caddyfile
+      - $PWD/tmp/tailscaled.sock:/var/run/tailscale/tailscaled.sock # Ref: https://blog.moospirit.org/post/2024/caddy-tailscale-docker/
+    network_mode:
+      service:tailscale
+
   cron:
     image: grd0.net/nextcloud:fpm-alpine
     build:
@@ -70,11 +87,13 @@ services:
     restart: always
     volumes:
       - nextcloud:/var/www/html:z
-      - /root/app/nextcloud/config:/var/www/html/config
-      - /root/storage/nextcloud/data:/var/www/html/data
-      - /root/app/nextcloud/themes:/var/www/html/themes
-      - /root/app/nextcloud/custom_apps:/var/www/html/custom_apps
+      - /mnt/nextcloud-data/config:/var/www/html/config
+      - /mnt/nextcloud-data/data:/var/www/html/data
+      - /mnt/nextcloud-data/themes:/var/www/html/themes
+      - /mnt/nextcloud-data/custom_apps:/var/www/html/custom_apps
       # NOTE: The `volumes` config of the `cron` and `app` containers must match
+    environment:
+      - PHP_MEMORY_LIMIT=1024M
     entrypoint: /cron.sh
     depends_on:
       - db
@@ -88,7 +107,16 @@ services:
       - TUNNEL_EDGE_IP_VERSION=auto
     env_file:
       - cloudflared.env
-  
+
+  tailscale:
+    image: tailscale/tailscale:latest
+    restart: unless-stopped
+    hostname: cloud
+    volumes:
+      - ${PWD}/tmp:/tmp
+    env_file:
+      - tailscale.env
+
   smtp:
     image: kostyaesmukov/smtp_to_telegram
     restart: always
