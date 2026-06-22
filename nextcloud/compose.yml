@@ -108,7 +108,7 @@ services:
     env_file:
       - cloudflared.env
 
-    tailscale:
+  tailscale:
     image: tailscale/tailscale:latest
     restart: unless-stopped
     hostname: cloud
