@@ -23,7 +23,7 @@ services:
         statistics_enabled: false
         use_pubsub_feeds: true
         use_innertube_for_captions: true
-        registration_enabled: true
+        registration_enabled: false
         hmac_key: "${INVIDIOUS_HMAC_KEY}"
     healthcheck:
       test: wget -nv --tries=1 --spider http://127.0.0.1:3000/api/v1/stats || exit 1
