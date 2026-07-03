@@ -7,6 +7,7 @@ services:
       # configuration options and their associated syntax:
       # https://github.com/iv-org/invidious/blob/master/config/config.example.yml
       INVIDIOUS_CONFIG: |
+        force_resolve: ipv6
         db:
           dbname: invidious
           user: ${POSTGRES_USER}
@@ -74,7 +75,7 @@ services:
     restart: unless-stopped
     command: tunnel run
     environment:
-      - TUNNEL_EDGE_IP_VERSION=auto
+      - TUNNEL_EDGE_IP_VERSION=6
     env_file:
       - cloudflared.env
 
@@ -85,3 +86,7 @@ volumes:
 networks:
   default:
     enable_ipv6: true
+    ipam:
+      config:
+        - subnet: 2001:0DB9::/112
+          gateway: 2001:0DB9::1
