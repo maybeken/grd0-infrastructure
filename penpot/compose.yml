@@ -6,7 +6,7 @@ x-flags: &penpot-flags
   PENPOT_FLAGS: enable-smtp enable-prepl-server enable-mcp enable-login-with-oidc enable-oidc-registration disable-onboarding
 
 x-uri: &penpot-public-uri
-  PENPOT_PUBLIC_URI: https://penpot.grd0.net
+  PENPOT_PUBLIC_URI: https://design.grd0.net
 
 x-body-size: &penpot-http-body-size
   # Max body size
