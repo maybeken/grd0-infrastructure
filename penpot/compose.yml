@@ -1,0 +1,198 @@
+##
+## You can read more about all available flags and other
+## environment variables here:
+## https://help.penpot.app/technical-guide/configuration/#penpot-configuration
+x-flags: &penpot-flags
+  PENPOT_FLAGS: enable-smtp enable-prepl-server enable-mcp enable-login-with-oidc enable-oidc-registration disable-onboarding
+
+x-uri: &penpot-public-uri
+  PENPOT_PUBLIC_URI: https://penpot.grd0.net
+
+x-body-size: &penpot-http-body-size
+  # Max body size
+  PENPOT_HTTP_SERVER_MAX_BODY_SIZE: 367001600
+  # Deprecation warning: this variable is deprecated. Use PENPOT_HTTP_SERVER_MAX_BODY (defaults to 367001600)
+  PENPOT_HTTP_SERVER_MAX_MULTIPART_BODY_SIZE: 367001600
+
+## Penpot SECRET KEY. It serves as a master key from which other keys for subsystems
+## (eg http sessions, or invitations) are derived.
+##
+## We recommend to use a trully randomly generated
+## 512 bits base64 encoded string here. You can generate one with:
+##
+## python3 -c "import secrets; print(secrets.token_urlsafe(64))"
+x-secret-key: &penpot-secret-key
+  PENPOT_SECRET_KEY: ${PENPOT_SECRET_KEY}
+
+networks:
+  default:
+    enable_ipv6: true
+
+volumes:
+  penpot_postgres_v15:
+  penpot_assets:
+
+services:
+  penpot-frontend:
+    image: "penpotapp/frontend:${PENPOT_VERSION:-2.16}"
+    restart: always
+
+    volumes:
+      - penpot_assets:/opt/data/assets
+
+    depends_on:
+      - penpot-backend
+      - penpot-exporter
+      - penpot-mcp
+
+    environment:
+      << : [*penpot-flags, *penpot-http-body-size, *penpot-public-uri]
+      # Set to "true" on hosts where IPv6 is disabled at kernel boot level.
+      # PENPOT_DISABLE_IPV6_LISTEN: "true"
+      # PENPOT_OIDC_NAME: grd0.net
+
+  penpot-backend:
+    image: "penpotapp/backend:${PENPOT_VERSION:-2.16}"
+    restart: always
+
+    volumes:
+      - penpot_assets:/opt/data/assets
+
+    depends_on:
+      penpot-postgres:
+        condition: service_healthy
+      penpot-valkey:
+        condition: service_healthy
+
+    env_file:
+      - oidc.env
+
+    ## Configuration envronment variables for the backend container.
+
+    environment:
+      << : [*penpot-flags, *penpot-public-uri, *penpot-http-body-size, *penpot-secret-key]
+
+      ## Database connection parameters. Don't touch them unless you are using custom
+      ## postgresql connection parameters.
+
+      PENPOT_DATABASE_URI: postgresql://penpot-postgres/penpot
+      PENPOT_DATABASE_USERNAME: ${PENPOT_DATABASE_USERNAME}
+      PENPOT_DATABASE_PASSWORD: ${PENPOT_DATABASE_PASSWORD}
+
+      ## Valkey (or previously redis) is used for the websockets notifications. Don't touch
+      ## unless the valkey container has different parameters or different name.
+
+      PENPOT_REDIS_URI: redis://penpot-valkey/0
+
+      ## Default configuration for assets storage: using filesystem based with all files
+      ## stored in a docker volume.
+
+      PENPOT_OBJECTS_STORAGE_BACKEND: fs
+      PENPOT_OBJECTS_STORAGE_FS_DIRECTORY: /opt/data/assets
+
+      ## Also can be configured to to use a S3 compatible storage.
+
+      # AWS_ACCESS_KEY_ID: <KEY_ID>
+      # AWS_SECRET_ACCESS_KEY: <ACCESS_KEY>
+      # PENPOT_OBJECTS_STORAGE_BACKEND: s3
+      # PENPOT_OBJECTS_STORAGE_S3_ENDPOINT: <ENDPOINT>
+      # PENPOT_OBJECTS_STORAGE_S3_BUCKET: <BUKET_NAME>
+
+      ## Telemetry. When enabled, a periodical process will send anonymous data about this
+      ## instance. Telemetry data will enable us to learn how the application is used,
+      ## based on real scenarios. If you want to help us, please leave it enabled. You can
+      ## audit what data we send with the code available on github.
+
+      PENPOT_TELEMETRY_ENABLED: "true"
+      PENPOT_TELEMETRY_REFERER: compose
+
+      ## Example SMTP/Email configuration. By default, emails are sent to the mailcatch
+      ## service, but for production usage it is recommended to setup a real SMTP
+      ## provider. Emails are used to confirm user registrations & invitations. Look below
+      ## how the mailcatch service is configured.
+
+      PENPOT_SMTP_DEFAULT_FROM: penpot@grd0.net
+      PENPOT_SMTP_DEFAULT_REPLY_TO: no-reply@grd0.net
+      PENPOT_SMTP_HOST: smtp
+      PENPOT_SMTP_PORT: 2525
+      PENPOT_SMTP_USERNAME:
+      PENPOT_SMTP_PASSWORD:
+      PENPOT_SMTP_TLS: "false"
+      PENPOT_SMTP_SSL: "false"
+
+      # PENPOT_REGISTRATION_DOMAIN_WHITELIST: grd0.net
+
+  penpot-mcp:
+    image: "penpotapp/mcp:${PENPOT_VERSION:-2.16}"
+    restart: always
+
+  penpot-exporter:
+    image: "penpotapp/exporter:${PENPOT_VERSION:-2.16}"
+    restart: always
+
+    depends_on:
+      penpot-valkey:
+        condition: service_healthy
+
+    environment:
+      << : [*penpot-secret-key, *penpot-public-uri]
+      # Don't touch it; this uses an internal docker network to
+      # communicate with the frontend.
+      PENPOT_INTERNAL_URI: http://penpot-frontend:8080
+
+      ## Valkey (or previously Redis) is used for the websockets notifications.
+      PENPOT_REDIS_URI: redis://penpot-valkey/0
+
+  penpot-postgres:
+    image: "postgres:15"
+    restart: always
+    stop_signal: SIGINT
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U penpot"]
+      interval: 2s
+      timeout: 10s
+      retries: 5
+      start_period: 2s
+
+    volumes:
+      - penpot_postgres_v15:/var/lib/postgresql/data
+
+    environment:
+      - POSTGRES_INITDB_ARGS=--data-checksums
+      - POSTGRES_DB=penpot
+      - POSTGRES_USER=${PENPOT_DATABASE_USERNAME}
+      - POSTGRES_PASSWORD=${PENPOT_DATABASE_PASSWORD}
+
+  penpot-valkey:
+    image: valkey/valkey:8.1
+    restart: always
+
+    healthcheck:
+      test: ["CMD-SHELL", "valkey-cli ping | grep PONG"]
+      interval: 1s
+      timeout: 3s
+      retries: 5
+      start_period: 3s
+
+    environment:
+      # You can increase the max memory size if you have sufficient resources,
+      # although this should not be necessary.
+      - VALKEY_EXTRA_FLAGS=--maxmemory 128mb --maxmemory-policy volatile-lfu
+
+  tunnel:
+    image: cloudflare/cloudflared
+    restart: unless-stopped
+    command: tunnel run
+    environment:
+      - TUNNEL_EDGE_IP_VERSION=auto
+    env_file:
+      - cloudflared.env
+
+  smtp:
+    image: kostyaesmukov/smtp_to_telegram
+    restart: always
+    environment:
+      - "Subject: {subject}\\n\\n{body}\\n\\n{attachments_details}"
+    env_file:
+      - smtp.env
