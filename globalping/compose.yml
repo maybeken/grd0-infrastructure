@@ -1,0 +1,10 @@
+services:
+  globalping-probe:
+    image: globalping/globalping-probe
+    restart: always
+    env_file:
+      - .env
+
+networks:
+  default:
+    enable_ipv6: true
