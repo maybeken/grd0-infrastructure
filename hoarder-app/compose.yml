@@ -25,6 +25,7 @@ services:
   chrome:
     image: ghcr.io/karakeep-app/karakeep-chrome:release
     restart: unless-stopped
+    init: true
     command:
       - --disable-gpu
       - --disable-dev-shm-usage
