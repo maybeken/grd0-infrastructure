@@ -1,0 +1,53 @@
+x-webtop-user: &webtop-user ken.lam
+
+services:
+  webtop:
+    image: lscr.io/linuxserver/webtop:debian-kde
+    container_name: webtop
+    restart: unless-stopped
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: Etc/UTC
+      WEBTOP_USER: *webtop-user
+      WEBTOP_DISPLAY_NAME: Ken Lam
+      USER: *webtop-user
+      LOGNAME: *webtop-user
+    volumes:
+      - home:/config
+      - ./rename-user.sh:/custom-cont-init.d/10-rename-user.sh:ro
+    shm_size: "1gb"
+    devices:
+      - /dev/dri:/dev/dri
+
+  tailscale:
+    image: tailscale/tailscale:latest
+    restart: unless-stopped
+    hostname: desktop
+    volumes:
+      - ${PWD}/tmp:/tmp
+    env_file:
+      - tailscale.env
+
+  caddy:
+    image: grd0.net/webtop-caddy:latest
+    build:
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - tailscale
+      - webtop
+    env_file:
+      - oidc.env
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - $PWD/tmp/tailscaled.sock:/var/run/tailscale/tailscaled.sock # Ref: https://blog.moospirit.org/post/2024/caddy-tailscale-docker/
+    network_mode:
+      service:tailscale
+
+volumes:
+  home:
+
+networks:
+  default:
+    enable_ipv6: true

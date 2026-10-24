@@ -1,0 +1,37 @@
+{
+	oidc {
+		issuer "{$OIDC_ISSUER}"
+		client_id "{$OIDC_CLIENT_ID}"
+		client_secret "{$OIDC_CLIENT_SECRET}"
+		scope openid profile email
+
+		authenticate cookie {
+			name webtop_session
+			secret "{$OIDC_COOKIE_SECRET}"
+			redirect_url /oauth2/callback
+			max_age 168h
+		}
+	}
+}
+
+:443 {
+	tls {
+		get_certificate tailscale
+	}
+
+	oidc {
+		allow {
+			user *
+		}
+	}
+
+	reverse_proxy https://webtop:3001 {
+		transport http {
+			tls_insecure_skip_verify
+		}
+	}
+
+	tls internal {
+		on_demand
+	}
+}
