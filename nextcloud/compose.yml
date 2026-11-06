@@ -20,6 +20,10 @@ services:
       - redis
       - db
       - smtp
+    devices:
+      - /dev/dri/renderD128:/dev/dri/renderD128
+    group_add:
+      - "992"
     volumes:
       - nextcloud:/var/www/html:z
       - /mnt/nextcloud-data/config:/var/www/html/config
